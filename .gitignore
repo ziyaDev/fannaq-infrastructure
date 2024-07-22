@@ -1,0 +1,16 @@
+*.dll
+*.exe
+.DS_Store
+example.tf
+terraform.tfplan
+ bin/
+bun.lockb*
+node_modules
+*.backup
+./*.tfstate
+.terraform/
+*.log
+*.bak
+*~
+.*.swp
+.idea
