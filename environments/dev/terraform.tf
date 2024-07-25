@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     aws = {
@@ -12,22 +13,4 @@ terraform {
       name = "fannaq-workspace-dev"
     }
   }
-}
-
-
-resource "aws_vpc" "main" {
-  cidr_block       = var.cidr_block
-  instance_tenancy = "default"
-
-
-
-  tags = merge(
-     {
-       "Name" = format("%s", var.name)
-     },
-     {
-       "Environment" =   var.env
-     },
-     var.tags,
-   )
 }

@@ -1,8 +1,7 @@
 {
   "name": "fannaq-infrastructure",
   "type": "module",
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {}
+  "peerDependencies": {},
+  "dependencies": {},
+  "license": "MIT"
 }

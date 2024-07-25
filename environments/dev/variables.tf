@@ -15,10 +15,6 @@ variable "variable_example_name" {
   }
   */
 }
-variable "region" {
-  description = "AWS region"
-  type        = string
- }
 variable "instance_name" {
   description = "Value of the Name tag for the EC2 instance"
   type        = string
