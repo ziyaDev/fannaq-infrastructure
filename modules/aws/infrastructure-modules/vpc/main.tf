@@ -1,3 +1,6 @@
+data "aws_availability_zones" "available" {}
+data "aws_region" "current" {}
+
 
 
 ###########
@@ -19,11 +22,6 @@ resource "aws_vpc" "vpc" {
    )
 }
 
-data "aws_availability_zones" "available" {}
-
-resource "aws_eip" "nat_eip" {
-  vpc = true
-}
 
 #######################
 ##### VPC subnets #####
@@ -31,7 +29,7 @@ resource "aws_eip" "nat_eip" {
 resource "aws_subnet" "vpc" {
   count = length(var.subnets)
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.${count.index}.0/24"
+  cidr_block              = "10.0.${count.index + 1}.0/24"
   availability_zone       = element(data.aws_availability_zones.available.names, count.index)
   map_public_ip_on_launch = var.subnets[count.index].map_public_ip_on_launch
   tags = {
@@ -103,6 +101,12 @@ locals {
   # Get the index of the first public subnet
   public_subnet_index = [for i, s in aws_subnet.vpc : i if s.map_public_ip_on_launch][0]
 }
+#######################
+##### NAT Gateway #####
+#######################
+resource "aws_eip" "nat_eip" {
+  vpc = true
+}
 resource "aws_nat_gateway" "nat_gw" {
   count = var.create_net_gw ? 1 : 0
   allocation_id = aws_eip.nat_eip.id
@@ -117,8 +121,9 @@ resource "aws_nat_gateway" "nat_gw" {
 }
 
 
-
-data "aws_region" "current" {}
+###########################
+##### VPC S3 ENDPOINT #####
+###########################
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.vpc.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
