@@ -9,6 +9,6 @@ provider "aws" {
   }
 
 module "network" {
-  source = "../modules/aws/infrastructure-live/network"
+  source = "../../modules/aws/infrastructure-live/network"
   region = local.aws_region
   }
