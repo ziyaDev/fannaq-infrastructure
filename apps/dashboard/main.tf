@@ -8,7 +8,7 @@ locals {
  protocol = "tcp"
  app_protocol = "http"
  container_name = "dashboard"
- image   ="ziadr265369/bun-hello-world-s:st"
+ image   ="471112889820.dkr.ecr.eu-west-3.amazonaws.com/fannaq-dashboard_repository:9c7c8b388a5f29ef1b033dc697cf398157c39397"
  readonly_root_filesystem = false
  route53_record = {
    name = var.app_sub_domain

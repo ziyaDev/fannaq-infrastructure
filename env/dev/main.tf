@@ -48,14 +48,20 @@ module "records" {
   version   = "~> 3.0"
   zone_name = keys(module.zones.route53_zone_zone_id)[0]
   records = [
+    {
+      name = ""
+      type = "A"
+      alias = {
+        name                   = module.alb.dns_name
+        zone_id                = module.alb.zone_id
+        evaluate_target_health = true
+      }
+     },
     module.nginx_server.route53_record,
     module.dashboard_app.route53_record,
     module.backend_app.route53_record,
     module.docs_app.route53_record,
-    module.ecommerce_app.route53_record,
-
-
-  ]
+    module.ecommerce_app.route53_record]
 }
 ################################################################################
 # ACM
@@ -123,82 +129,82 @@ module "cache" {
 # Nginx Server                                                                 #
 ################################################################################
 module "nginx_server" {
-  source      = "../../apps/nginx"
-  alb_priority = 5
-  env         = var.env
-  domain_name = var.domain_name
-  alb_zone_id = module.alb.zone_id
-  public_subnets = module.vpc.public_subnets
+  source            = "../../apps/nginx"
+  alb_priority      = 105
+  env               = var.env
+  domain_name       = var.domain_name
+  alb_zone_id       = module.alb.zone_id
+  public_subnets    = module.vpc.public_subnets
   security_group_id = module.alb.security_group_id
-  target_groups = module.alb.target_groups
-  alb_dns_name = module.alb.dns_name
-  app_domain_name = "nginx.${var.domain_name}"
-  app_sub_domain = "nginx"
- }
+  target_groups     = module.alb.target_groups
+  alb_dns_name      = module.alb.dns_name
+  app_domain_name   = "nginx.${var.domain_name}"
+  app_sub_domain    = "nginx"
+}
 ################################################################################
 # Dashboard app                                                                 #
 ################################################################################
 module "dashboard_app" {
-  source      = "../../apps/dashboard"
-  alb_priority = 2
-  env         = var.env
-  domain_name = var.domain_name
-  alb_zone_id = module.alb.zone_id
-  public_subnets = module.vpc.public_subnets
+  source            = "../../apps/dashboard"
+  alb_priority      = 103
+  env               = var.env
+  domain_name       = var.domain_name
+  alb_zone_id       = module.alb.zone_id
+  public_subnets    = module.vpc.public_subnets
   security_group_id = module.alb.security_group_id
-  target_groups = module.alb.target_groups
-  alb_dns_name = module.alb.dns_name
-  app_domain_name = "app.${var.domain_name}"
-  app_sub_domain = "app"
- }
+  target_groups     = module.alb.target_groups
+  alb_dns_name      = module.alb.dns_name
+  app_domain_name   = "app.${var.domain_name}"
+  app_sub_domain    = "app"
+}
 ################################################################################
 # Backend app                                                                  #
 ################################################################################
 module "backend_app" {
-  source      = "../../apps/backend"
-  alb_priority = 3
-  env         = var.env
-  domain_name = var.domain_name
-  alb_zone_id = module.alb.zone_id
-  public_subnets = module.vpc.public_subnets
+  source            = "../../apps/backend"
+  alb_priority      = 102
+  env               = var.env
+  domain_name       = var.domain_name
+  alb_zone_id       = module.alb.zone_id
+  public_subnets    = module.vpc.public_subnets
   security_group_id = module.alb.security_group_id
-  target_groups = module.alb.target_groups
-  alb_dns_name = module.alb.dns_name
-  app_domain_name = "api.${var.domain_name}"
-  app_sub_domain = "api"
- }
+  target_groups     = module.alb.target_groups
+  alb_dns_name      = module.alb.dns_name
+  app_domain_name   = "api.${var.domain_name}"
+  app_sub_domain    = "api"
+}
 ################################################################################
 # Documentation app                                                                 #
 ################################################################################
 module "docs_app" {
-  source      = "../../apps/docs"
-  alb_priority = 4
-  env         = var.env
-  domain_name = var.domain_name
-  alb_zone_id = module.alb.zone_id
-  public_subnets = module.vpc.public_subnets
+  source            = "../../apps/docs"
+  alb_priority      = 101
+  env               = var.env
+  domain_name       = var.domain_name
+  alb_zone_id       = module.alb.zone_id
+  public_subnets    = module.vpc.public_subnets
   security_group_id = module.alb.security_group_id
-  target_groups = module.alb.target_groups
-  alb_dns_name = module.alb.dns_name
-  app_domain_name = "docs.${var.domain_name}"
-  app_sub_domain = "docs"
- }
+  target_groups     = module.alb.target_groups
+  alb_dns_name      = module.alb.dns_name
+  app_domain_name   = "docs.${var.domain_name}"
+  app_sub_domain    = "docs"
+}
 ################################################################################
 # E-commerce app                                                                 #
 ################################################################################
 module "ecommerce_app" {
-  source      = "../../apps/ecommerce"
-  alb_priority = 1
-  env         = var.env
-  domain_name = var.domain_name
-  alb_zone_id = module.alb.zone_id
-  public_subnets = module.vpc.public_subnets
+  source            = "../../apps/ecommerce"
+  alb_priority      = 100
+  env               = var.env
+  domain_name       = var.domain_name
+  alb_zone_id       = module.alb.zone_id
+  public_subnets    = module.vpc.public_subnets
   security_group_id = module.alb.security_group_id
-  target_groups = module.alb.target_groups
-  alb_dns_name = module.alb.dns_name
-  app_domain_name = "${var.domain_name}"
-  app_sub_domain = ""
- }
+  target_groups     = module.alb.target_groups
+  alb_dns_name      = module.alb.dns_name
+  app_domain_name   = "www.${var.domain_name}"
+  app_sub_domain    = "www"
+}
 
 ################################################################################
 # Load balancer
@@ -251,23 +257,30 @@ module "alb" {
       protocol        = "HTTPS"
       ssl_policy      = "ELBSecurityPolicy-2016-08"
       certificate_arn = module.acm.acm_certificate_arn
-      forward = {
-        target_group_key = (module.ecommerce_app.app_name)
+      # forward = {
+      #   target_group_key = (module.ecommerce_app.app_name)
+      # }
+      redirect = {
+        status_code = "HTTP_302"
+        host        = "www.${var.domain_name}"
+        path        = "/"
+        protocol    = "HTTPS"
       }
       rules = {
-        ("to_${module.nginx_server.app_name}") = module.nginx_server.alb_rule
+        ("to_${module.nginx_server.app_name}")  = module.nginx_server.alb_rule
         ("to_${module.dashboard_app.app_name}") = module.dashboard_app.alb_rule
-        ("to_${module.backend_app.app_name}") = module.backend_app.alb_rule
-        ("to_${module.docs_app.app_name}") = module.docs_app.alb_rule
+        ("to_${module.backend_app.app_name}")   = module.backend_app.alb_rule
+        ("to_${module.docs_app.app_name}")      = module.docs_app.alb_rule
         ("to_${module.ecommerce_app.app_name}") = module.ecommerce_app.alb_rule
+
       }
     }
   }
   target_groups = {
-    (module.nginx_server.app_name) = module.nginx_server.alb_target_group
+    (module.nginx_server.app_name)  = module.nginx_server.alb_target_group
     (module.dashboard_app.app_name) = module.dashboard_app.alb_target_group
-    (module.backend_app.app_name) = module.backend_app.alb_target_group
-    (module.docs_app.app_name) = module.docs_app.alb_target_group
+    (module.backend_app.app_name)   = module.backend_app.alb_target_group
+    (module.docs_app.app_name)      = module.docs_app.alb_target_group
     (module.ecommerce_app.app_name) = module.ecommerce_app.alb_target_group
   }
 }
@@ -304,10 +317,10 @@ module "ecs" {
   }
 
   services = {
-    (module.nginx_server.app_name) = module.nginx_server.ecs_service
+    (module.nginx_server.app_name)  = module.nginx_server.ecs_service
     (module.dashboard_app.app_name) = module.dashboard_app.ecs_service
-    (module.backend_app.app_name) = module.backend_app.ecs_service
-    (module.docs_app.app_name) = module.docs_app.ecs_service
+    (module.backend_app.app_name)   = module.backend_app.ecs_service
+    (module.docs_app.app_name)      = module.docs_app.ecs_service
     (module.ecommerce_app.app_name) = module.ecommerce_app.ecs_service
   }
 
